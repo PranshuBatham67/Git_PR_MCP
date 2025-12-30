@@ -1,0 +1,32 @@
+# Render Deployment Configuration
+# This file helps configure your MCP PR Agent deployment on Render
+
+services:
+  - type: web
+    name: mcp-pr-webhook
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    buildCommand: docker build -t mcp-pr-webhook .
+    startCommand: python webhook_server.py
+
+    # Environment variables (set these in Render dashboard)
+    envVars:
+      - key: SLACK_WEBHOOK_URL
+        value: YOUR_SLACK_WEBHOOK_URL
+      - key: HUGGINGFACE_API_TOKEN
+        value: YOUR_HUGGINGFACE_TOKEN
+
+    # Health check
+    healthCheckPath: /
+    healthCheckTimeout: 300
+
+    # Port configuration
+    port: 8080
+
+    # Auto-deploy on git push
+    autoDeploy: true
+
+    # Branch to deploy
+    branch: main
+
+# Note: The MCP server (server.py) should be run locally by users
