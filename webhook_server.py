@@ -5,6 +5,7 @@ Stores events in a JSON file that the MCP server can read.
 """
 
 import json
+import os
 from datetime import datetime
 from pathlib import Path
 from aiohttp import web
@@ -51,7 +52,11 @@ app = web.Application()
 app.router.add_post('/webhook/github', handle_webhook)
 
 if __name__ == '__main__':
-    print("🚀 Starting webhook server on http://localhost:8080")
+    # Bind to 0.0.0.0 for container/external access
+    host = os.getenv('HOST', '0.0.0.0')
+    port = int(os.getenv('PORT', 8080))
+
+    print(f"🚀 Starting webhook server on http://{host}:{port}")
     print("📝 Events will be saved to:", EVENTS_FILE)
-    print("🔗 Webhook URL: http://localhost:8080/webhook/github")
-    web.run_app(app, host='localhost', port=8080)
+    print(f"🔗 Webhook URL: http://{host}:{port}/webhook/github")
+    web.run_app(app, host=host, port=port)
