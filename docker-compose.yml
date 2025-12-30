@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  pr-mcp-webhook:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}
+      - HUGGINGFACE_API_TOKEN=${HUGGINGFACE_API_TOKEN}
+    volumes:
+      - ./github_events.json:/app/github_events.json
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; s=socket.socket(); s.connect(('localhost', 8080))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Note: MCP server (server.py) should be run locally by MCP clients
+  # The webhook server handles GitHub webhooks and stores data for the MCP server
