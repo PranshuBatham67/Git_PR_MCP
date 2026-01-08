@@ -13,6 +13,13 @@ from aiohttp import web
 # File to store events
 EVENTS_FILE = Path(__file__).parent / "github_events.json"
 
+async def health_check(request):
+    """Health check endpoint for monitoring"""
+    return web.json_response({
+        "status": "healthy",
+        "service": "GitHub PR MCP Webhook Server"
+    })
+
 async def handle_webhook(request):
     """Handle incoming GitHub webhook"""
     try:
@@ -47,8 +54,9 @@ async def handle_webhook(request):
     except Exception as e:
         return web.json_response({"error": str(e)}, status=400)
 
-# Create app and add route
+# Create app and add routes
 app = web.Application()
+app.router.add_get('/', health_check)
 app.router.add_post('/webhook/github', handle_webhook)
 
 if __name__ == '__main__':
